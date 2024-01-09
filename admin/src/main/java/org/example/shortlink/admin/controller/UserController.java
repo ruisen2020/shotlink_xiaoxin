@@ -9,6 +9,7 @@ import org.example.shortlink.admin.dto.resp.UserRespDTO;
 import org.example.shortlink.admin.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -44,5 +45,16 @@ public class UserController {
     @GetMapping("/api/shortlink/admin/v1/actual/user/{username}")
     public Result<UserActualRespDTO> getActualUserByUsername(@PathVariable("username") String username) {
         return Results.success(BeanUtil.toBean(userService.getUserByUsername(username), UserActualRespDTO.class));
+    }
+
+    /**
+     * 查询用户名是否存在
+     * @param name
+     * @return
+     */
+    @GetMapping("/api/shortlink/admin/v1/user/has-username")
+    public Result<Boolean> hasUsername(@RequestParam("username")String name )
+    {
+        return Results.success(userService.hasUsername(name));
     }
 }
