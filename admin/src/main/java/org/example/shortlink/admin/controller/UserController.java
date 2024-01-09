@@ -1,6 +1,9 @@
 package org.example.shortlink.admin.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.shortlink.admin.common.convention.result.Result;
+import org.example.shortlink.admin.common.convention.result.Results;
+import org.example.shortlink.admin.common.enums.UserErrorCodeEnum;
 import org.example.shortlink.admin.dto.resp.UserRespDTO;
 import org.example.shortlink.admin.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,19 +21,23 @@ public class UserController {
 
     // 自动注入UserService对象， @Autowired 是根据类型自动注入对象，如果有多个实现类，则会报错
 
+    // 使用@RequiredArgsConstructor注入的时候，一定要加final关键字
     private final UserService userService;
-
-//    private final UserService userService;
 
     /**
      * 根据用户名获取用户信息
+     *
      * @param username 用户名
      * @return 用户信息
      */
-    @GetMapping("/api/shortlink/v1/user/{username}") // 使用@GetMapping注解表示对HTTP GET请求的处理。函数的路径为"/api/shortlink/v1/user/{username}"，即当访问该路径时，将会调用该函数。参数username为路径中的变量，可以被函数使用。
-    public UserRespDTO getUserByUsername(@PathVariable String username) {
-        UserRespDTO userByUsername = userService.getUserByUsername(username);
-        System.out.println(userByUsername);
-        return userByUsername;
+    @GetMapping("/api/shortlink/v1/user/{username}")
+    // 使用@GetMapping注解表示对HTTP GET请求的处理。函数的路径为"/api/shortlink/v1/user/{username}"，即当访问该路径时，将会调用该函数。参数username为路径中的变量，可以被函数使用。
+    public Result<UserRespDTO> getUserByUsername(@PathVariable String username) {
+        UserRespDTO result = userService.getUserByUsername(username);
+        if (result == null) {
+            return new Result<UserRespDTO>().setCode(UserErrorCodeEnum.USER_NULL.code()).setMessage(UserErrorCodeEnum.USER_NULL.message());
+        } else {
+            return Results.success(result);
+        }
     }
 }
