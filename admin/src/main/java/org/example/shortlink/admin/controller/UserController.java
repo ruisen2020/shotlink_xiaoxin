@@ -1,9 +1,10 @@
 package org.example.shortlink.admin.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import lombok.RequiredArgsConstructor;
 import org.example.shortlink.admin.common.convention.result.Result;
 import org.example.shortlink.admin.common.convention.result.Results;
-import org.example.shortlink.admin.common.enums.UserErrorCodeEnum;
+import org.example.shortlink.admin.dto.resp.UserActualRespDTO;
 import org.example.shortlink.admin.dto.resp.UserRespDTO;
 import org.example.shortlink.admin.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,10 +35,14 @@ public class UserController {
     // 使用@GetMapping注解表示对HTTP GET请求的处理。函数的路径为"/api/shortlink/v1/user/{username}"，即当访问该路径时，将会调用该函数。参数username为路径中的变量，可以被函数使用。
     public Result<UserRespDTO> getUserByUsername(@PathVariable String username) {
         UserRespDTO result = userService.getUserByUsername(username);
-        if (result == null) {
-            return new Result<UserRespDTO>().setCode(UserErrorCodeEnum.USER_NULL.code()).setMessage(UserErrorCodeEnum.USER_NULL.message());
-        } else {
-            return Results.success(result);
-        }
+        return Results.success(result);
+    }
+
+    /**
+     * 根据用户名查询无脱敏用户信息
+     */
+    @GetMapping("/api/shortlink/admin/v1/actual/user/{username}")
+    public Result<UserActualRespDTO> getActualUserByUsername(@PathVariable("username") String username) {
+        return Results.success(BeanUtil.toBean(userService.getUserByUsername(username), UserActualRespDTO.class));
     }
 }
