@@ -4,11 +4,13 @@ package org.example.shortlink.admin.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.example.shortlink.admin.common.convention.exception.ClientException;
 import org.example.shortlink.admin.common.enums.UserErrorCodeEnum;
 import org.example.shortlink.admin.dao.entity.UserDO;
 import org.example.shortlink.admin.dao.mapper.UserMapper;
 import org.example.shortlink.admin.dto.resp.UserRespDTO;
+import org.redisson.api.RBloomFilter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +19,11 @@ import org.springframework.stereotype.Service;
  */
 // @Service注解是Spring框架的一个注解，用于标注一个类为服务类，表明该类是一个服务提供者，可以被Spring容器管理，从而可以在应用程序中进行依赖注入。
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements UserService {
 
+    // 布隆过滤器，用于在用户注册时，判断用户是否存在
+    private final RBloomFilter<String> userRegisterCachePenetrationBloomFilter;
 
     @Override
     public UserRespDTO getUserByUsername(String username) {
@@ -35,8 +40,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     @Override
     public Boolean hasUsername(String username) {
-        LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class).eq(UserDO::getUsername, username);
-        UserDO userDO = baseMapper.selectOne(queryWrapper);
-        return userDO != null;
+//        LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class).eq(UserDO::getUsername, username);
+//        UserDO userDO = baseMapper.selectOne(queryWrapper);
+        return userRegisterCachePenetrationBloomFilter.contains(username);
     }
 }
