@@ -56,8 +56,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     @Override
     public void register(UserRegisterReqDTO userRegisterReqDTO) {
+        System.out.println(userRegisterReqDTO);
         if (hasUsername(userRegisterReqDTO.getUsername())) {
             throw new ClientException(USER_NAME_EXIST);
+//            throw  new RuntimeException();
         }
         // 使用分布式锁来防止恶意发起大量相同用户名注册，给数据库造成巨大压力
         RLock lock = redissonClient.getLock(LOCK_USER_REGISTER_KEY + userRegisterReqDTO.getUsername());
@@ -67,10 +69,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 int insert = baseMapper.insert(BeanUtil.toBean(userRegisterReqDTO, UserDO.class));
                 if (insert < 1) {
                     throw new ClientException(UserErrorCodeEnum.USER_SAVE_ERROR);
+//                    throw  new RuntimeException();
                 }
                 userRegisterCachePenetrationBloomFilter.add(userRegisterReqDTO.getUsername());
             } else {
-                throw new ClientException(UserErrorCodeEnum.USER_NAME_EXIST);
+                throw new ClientException(USER_NAME_EXIST);
+//                throw  new RuntimeException();
             }
         } finally {
             lock.unlock();
