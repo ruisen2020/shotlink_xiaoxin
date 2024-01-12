@@ -56,7 +56,7 @@ public class UserDO {
     /**
      * 修改时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     /**
