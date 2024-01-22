@@ -12,7 +12,7 @@ import org.example.shortlink.admin.common.database.BaseDO;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GroupDO  extends BaseDO {
+public class GroupDO extends BaseDO {
 
     /**
      * id
@@ -34,4 +34,8 @@ public class GroupDO  extends BaseDO {
      */
     private String username;
 
+    /**
+     * 分组排序
+     */
+    private Integer sortOrder;
 }
