@@ -1,4 +1,4 @@
-package org.example.shortlink.admin.service;
+package org.example.shortlink.admin.service.impl;
 
 
 import cn.hutool.core.bean.BeanUtil;
@@ -19,6 +19,7 @@ import org.example.shortlink.admin.dto.req.UserRegisterReqDTO;
 import org.example.shortlink.admin.dto.req.UserUpdateReqDTO;
 import org.example.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.example.shortlink.admin.dto.resp.UserRespDTO;
+import org.example.shortlink.admin.service.UserService;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
