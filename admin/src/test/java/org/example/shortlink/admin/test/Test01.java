@@ -1,6 +1,17 @@
 package org.example.shortlink.admin.test;
 
+
+import org.example.shortlink.admin.ShortLinkAdminApplication;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
+
+@SpringBootTest(classes = {ShortLinkAdminApplication.class})
 public class Test01 {
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
     private final static String str = "create table t_user_%d\n" +
             "(\n" +
             "    id            bigint auto_increment comment 'ID'\n" +
@@ -19,7 +30,16 @@ public class Test01 {
             ")\n" +
             "    charset = utf8mb4;";
 
+    @Test
+    void test01() {
+        String LOGIN_USER_KEY = "login:" + "xiaoxin128";
+        String token = "1f44d083-2bbb-4ced-a354-fb8ccf11b58d";
+        Object userInfoJsonStr = stringRedisTemplate.opsForHash().get(LOGIN_USER_KEY, token);
+        System.out.println(userInfoJsonStr != null);
+    }
+
     public static void main(String[] args) {
+
         for (int i = 0; i < 16; i++) {
             System.out.printf(str, i);
         }

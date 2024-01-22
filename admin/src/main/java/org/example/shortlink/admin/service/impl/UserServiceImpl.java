@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.example.shortlink.admin.common.biz.user.UserContext;
 import org.example.shortlink.admin.common.convention.exception.ClientException;
 import org.example.shortlink.admin.common.enums.UserErrorCodeEnum;
 import org.example.shortlink.admin.dao.entity.UserDO;
@@ -28,6 +29,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static org.example.shortlink.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
@@ -99,7 +101,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     @Override
     public void update(UserUpdateReqDTO userUpdateReqDTO) {
-        // TODO: 需要验证当前用户名是否为登录用户
+        // 验证当前用户名是否为登录用户
+        if (!Objects.equals(UserContext.getUsername(), userUpdateReqDTO.getUsername())) {
+            throw new ClientException(UserErrorCodeEnum.USER_UPDATE_ERROR);
+        }
         // 可以将用户id传入进来，或者根据token信息判断
         LambdaUpdateWrapper<UserDO> updateWrapper = Wrappers.lambdaUpdate(UserDO.class).eq(UserDO::getUsername, userUpdateReqDTO.getUsername());
         int update = baseMapper.update(BeanUtil.toBean(userUpdateReqDTO, UserDO.class), updateWrapper);
@@ -122,15 +127,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
         // 如果之前已经登录过了并且token没有失效，那么在登陆的时候删除原来的token，在创建一个新的token。
         Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries(LOGIN_USER_KEY);
+        String token = null;
         if (CollUtil.isNotEmpty(hasLoginMap)) {
-            String token = hasLoginMap.keySet().stream()
+            token = hasLoginMap.keySet().stream()
                     .findFirst()
                     .map(Object::toString)
                     .orElseThrow(() -> new ClientException(USER_LOGIN_FAIL));
             stringRedisTemplate.delete(LOGIN_USER_KEY);
         }
 
-        String token = UUID.randomUUID().toString();
+        token = UUID.randomUUID().toString();
         stringRedisTemplate.opsForHash().put(LOGIN_USER_KEY, token, JSON.toJSONString(userDO));
         stringRedisTemplate.expire(LOGIN_USER_KEY, 30, TimeUnit.MINUTES);
         return new UserLoginRespDTO(token);
