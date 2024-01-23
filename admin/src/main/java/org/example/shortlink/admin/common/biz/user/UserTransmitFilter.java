@@ -12,7 +12,6 @@ import java.io.IOException;
 
 /**
  * 用户信息传输过滤器
- * 公众号：马丁玩编程，回复：加群，添加马哥微信（备注：link）获取项目资料
  */
 @RequiredArgsConstructor
 public class UserTransmitFilter implements Filter {
@@ -27,8 +26,10 @@ public class UserTransmitFilter implements Filter {
         String username = httpServletRequest.getHeader("username");
         String token = httpServletRequest.getHeader("token");
         String LOGIN_USER_KEY = "login:" + username;
+        // 如果key的值为null，会抛出异常，也就是LOGIN_USER_KEY为空.
+        // 只要不为空，那么就可以继续往下执行
+        // 因为这里是过滤器，不是拦截器
         Object userInfoJsonStr = stringRedisTemplate.opsForHash().get(LOGIN_USER_KEY, token);
-        System.out.println(userInfoJsonStr);
         if (userInfoJsonStr != null) {
             UserInfoDTO userInfoDTO = JSON.parseObject(userInfoJsonStr.toString(), UserInfoDTO.class);
             UserContext.setUser(userInfoDTO);

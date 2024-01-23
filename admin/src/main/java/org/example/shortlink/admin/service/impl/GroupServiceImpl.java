@@ -12,6 +12,7 @@ import org.example.shortlink.admin.common.convention.exception.ClientException;
 import org.example.shortlink.admin.common.enums.GroupErrorCodeEnum;
 import org.example.shortlink.admin.dao.entity.GroupDO;
 import org.example.shortlink.admin.dao.mapper.GroupMapper;
+import org.example.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import org.example.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.example.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
 import org.example.shortlink.admin.service.GroupService;
@@ -80,6 +81,22 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         if (update < 1) {
             throw new ClientException(GroupErrorCodeEnum.Group_DELETE_ERROR);
         }
+    }
+
+    @Override
+    public void sortGroup(List<ShortLinkGroupSortReqDTO> shortLinkGroupSortReqDTOS) {
+        shortLinkGroupSortReqDTOS.forEach(shortLinkGroupSortReqDTO -> {
+            LambdaUpdateWrapper<GroupDO> updateWrapper = Wrappers.lambdaUpdate(GroupDO.class)
+                    .eq(GroupDO::getUsername, UserContext.getUsername())
+                    .eq(GroupDO::getGid, shortLinkGroupSortReqDTO.getGid())
+                    .eq(GroupDO::getDelFlag, 0);
+            GroupDO groupDO = new GroupDO();
+            groupDO.setSortOrder(shortLinkGroupSortReqDTO.getSortOrder());
+            int update = baseMapper.update(groupDO, updateWrapper);
+            if (update < 1) {
+                throw new ClientException(GroupErrorCodeEnum.Group_SORT_ERROR);
+            }
+        });
     }
 
     /**
