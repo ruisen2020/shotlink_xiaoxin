@@ -20,7 +20,7 @@ public class UserConfiguration {
         FilterRegistrationBean<UserTransmitFilter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new UserTransmitFilter(stringRedisTemplate));
         filterRegistrationBean.addUrlPatterns("/*");
-//        filterRegistrationBean.addInitParameter("excludedUris", "/api/short-link/admin/v1/user/login");
+        filterRegistrationBean.addInitParameter("excludedUris", "/api/short-link/admin/v1/user/login");
         filterRegistrationBean.setOrder(1);
         return filterRegistrationBean;
     }
