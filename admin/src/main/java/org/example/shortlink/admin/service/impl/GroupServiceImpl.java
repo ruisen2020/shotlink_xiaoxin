@@ -34,9 +34,8 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         String gid;
         do {
             gid = RandomGenerator.generateRandom();
-        } while (hasGid(UserContext.getUsername(), gid));
-        System.out.println(UserContext.getUsername());
-        GroupDO groupDO = new GroupDO().builder()
+        } while (hasGid(gid));
+        GroupDO groupDO = GroupDO.builder()
                 .gid(gid)
                 .username(UserContext.getUsername())
                 .name(groupName)
@@ -101,15 +100,10 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
 
     /**
      * 查询是否有该Gid
-     *
-     * @param username
-     * @param gid
-     * @return
      */
-    private boolean hasGid(String username, String gid) {
+    private boolean hasGid(String gid) {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
-                .eq(GroupDO::getGid, gid)
-                .eq(GroupDO::getUsername, username);
+                .eq(GroupDO::getGid, gid);
         GroupDO hasGroupFlag = baseMapper.selectOne(queryWrapper);
         return hasGroupFlag != null;
     }
