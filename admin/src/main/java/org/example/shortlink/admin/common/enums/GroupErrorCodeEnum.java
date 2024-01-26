@@ -3,7 +3,7 @@ package org.example.shortlink.admin.common.enums;
 import org.example.shortlink.admin.common.convention.errorcode.IErrorCode;
 
 /**
- * 用户错误码
+ * 短链接分组错误码
  */
 public enum GroupErrorCodeEnum implements IErrorCode {
 

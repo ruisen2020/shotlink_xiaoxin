@@ -35,7 +35,7 @@ public class UserController {
      * @param username 用户名
      * @return 用户信息
      */
-    @GetMapping("/api/short-link/v1/user/{username}")
+    @GetMapping("/api/short-link/admin/v1/user/{username}")
     // 使用@GetMapping注解表示对HTTP GET请求的处理。函数的路径为"/api/shortlink/v1/user/{username}"，即当访问该路径时，将会调用该函数。参数username为路径中的变量，可以被函数使用。
     public Result<UserRespDTO> getUserByUsername(@PathVariable String username) {
         UserRespDTO result = userService.getUserByUsername(username);
