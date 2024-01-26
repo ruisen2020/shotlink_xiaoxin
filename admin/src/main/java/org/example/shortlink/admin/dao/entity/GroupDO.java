@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.shortlink.admin.common.database.BaseDO;
+import org.example.shortlink.common.database.BaseDO;
+
 
 @Data
 @TableName("t_group")

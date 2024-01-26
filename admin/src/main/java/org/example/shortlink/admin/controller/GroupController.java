@@ -2,13 +2,13 @@ package org.example.shortlink.admin.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.example.shortlink.admin.common.convention.result.Result;
-import org.example.shortlink.admin.common.convention.result.Results;
 import org.example.shortlink.admin.dto.req.ShortLinkGroupSaveReqDTO;
 import org.example.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import org.example.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.example.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
 import org.example.shortlink.admin.service.GroupService;
+import org.example.shortlink.common.convention.result.Result;
+import org.example.shortlink.common.convention.result.Results;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

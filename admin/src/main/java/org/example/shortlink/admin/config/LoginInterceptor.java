@@ -2,7 +2,7 @@ package org.example.shortlink.admin.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.shortlink.admin.common.biz.user.UserContext;
+import org.example.shortlink.common.biz.user.UserContext;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 public class LoginInterceptor implements HandlerInterceptor {

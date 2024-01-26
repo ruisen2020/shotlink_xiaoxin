@@ -2,7 +2,8 @@ package org.example.shortlink.admin.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import org.example.shortlink.admin.common.database.BaseDO;
+import org.example.shortlink.common.database.BaseDO;
+
 
 @Data // @Data是Lombok的一个注解，用于同时生成getter、setter、toString、equals和hashcode方法。可以简化Java类的代码编写，提高开发效率。
 @TableName("t_user") // @TableName注解用于在Java中指定函数操作的目标表是哪个，方便在代码中进行数据库操作时指定表名。

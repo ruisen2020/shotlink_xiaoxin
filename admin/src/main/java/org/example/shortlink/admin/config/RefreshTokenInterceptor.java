@@ -5,15 +5,15 @@ import com.alibaba.fastjson2.JSON;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.example.shortlink.admin.common.biz.user.UserContext;
-import org.example.shortlink.admin.common.biz.user.UserInfoDTO;
+import org.example.shortlink.common.biz.user.UserContext;
+import org.example.shortlink.common.biz.user.UserInfoDTO;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.example.shortlink.admin.common.constant.RedisCacheConstant.LOGIN_USER_KEY;
-import static org.example.shortlink.admin.common.constant.RedisCacheConstant.LOGIN_USER_TTL;
+import static org.example.shortlink.common.constant.RedisCacheConstant.LOGIN_USER_KEY;
+import static org.example.shortlink.common.constant.RedisCacheConstant.LOGIN_USER_TTL;
 
 
 @RequiredArgsConstructor

@@ -10,9 +10,6 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.example.shortlink.admin.common.biz.user.UserContext;
-import org.example.shortlink.admin.common.convention.exception.ClientException;
-import org.example.shortlink.admin.common.enums.UserErrorCodeEnum;
 import org.example.shortlink.admin.dao.entity.UserDO;
 import org.example.shortlink.admin.dao.mapper.UserMapper;
 import org.example.shortlink.admin.dto.req.UserLoginReqDTO;
@@ -21,6 +18,9 @@ import org.example.shortlink.admin.dto.req.UserUpdateReqDTO;
 import org.example.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.example.shortlink.admin.dto.resp.UserRespDTO;
 import org.example.shortlink.admin.service.UserService;
+import org.example.shortlink.common.biz.user.UserContext;
+import org.example.shortlink.common.convention.exception.ClientException;
+import org.example.shortlink.common.enums.UserErrorCodeEnum;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static org.example.shortlink.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
-import static org.example.shortlink.admin.common.constant.RedisCacheConstant.LOGIN_USER_KEY;
-import static org.example.shortlink.admin.common.enums.UserErrorCodeEnum.*;
+import static org.example.shortlink.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
+import static org.example.shortlink.common.constant.RedisCacheConstant.LOGIN_USER_KEY;
+import static org.example.shortlink.common.enums.UserErrorCodeEnum.*;
 
 /**
  * 用户接口实现层

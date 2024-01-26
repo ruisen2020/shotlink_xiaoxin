@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.shortlink.project.common.convention.exception.ServiceException;
+import org.example.shortlink.common.convention.exception.ServiceException;
 import org.example.shortlink.project.dao.entity.ShortLinkDO;
 import org.example.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.example.shortlink.project.dto.req.ShortLinkCreateReqDTO;
@@ -22,8 +22,9 @@ import org.redisson.api.RBloomFilter;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
-import static org.example.shortlink.project.common.enums.ShortLinkErrorCodeEnum.SHORTLINK_CREATE_ERROR;
-import static org.example.shortlink.project.common.enums.ShortLinkErrorCodeEnum.SHORTLINK_SAVE_ERROR;
+import static org.example.shortlink.common.enums.ShortLinkErrorCodeEnum.SHORTLINK_CREATE_ERROR;
+import static org.example.shortlink.common.enums.ShortLinkErrorCodeEnum.SHORTLINK_SAVE_ERROR;
+
 
 /**
  * 短链接接口层实现类

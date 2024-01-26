@@ -2,7 +2,8 @@ package org.example.shortlink.admin.dto.resp;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
-import org.example.shortlink.admin.common.serialize.PhoneDesensitizationSerializer;
+import org.example.shortlink.common.serialize.PhoneDesensitizationSerializer;
+
 
 /**
  * 用户返回参数响应

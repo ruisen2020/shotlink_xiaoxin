@@ -6,8 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.shortlink.project.common.databse.BaseDO;
-
+import org.example.shortlink.common.database.BaseDO;
 
 import java.util.Date;
 
