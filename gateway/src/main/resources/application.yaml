@@ -1,2 +1,15 @@
-server:
-  port: 8000
+##spring:
+##  cloud:
+##    gateway:
+##      routes:
+##        - id: link-service
+##          uri: lb://link-service
+##          predicates:
+##            - Path=/api/short-link/project/**
+#
+#spring:
+#  cloud:
+#    nacos:
+#      server-addr: 121.41.117.104:8848
+#
+#

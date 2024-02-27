@@ -45,9 +45,38 @@ public class Test01 {
     }
 
     public static void main(String[] args) {
-
-        for (int i = 0; i < 16; i++) {
-            System.out.printf(str, i);
+        int a = 52;
+        while (a > 0) {
+//            System.out.println(a % 26);
+            if (a % 26 == 0) {
+                a -= 26;
+                System.out.println("Z");
+            } else {
+                char c = (char) (a % 26 - 1 + 'A');
+                System.out.println(c);
+            }
+            a /= 26;
         }
+//        Scanner sc = new Scanner(System.in);
+//        int n = sc.nextInt();
+//        String[] str = new String[n];
+//        for (int i = 0; i < n; i++) {
+//            str[i] = sc.next();
+//        }
+//        HashMap<String, Integer> hashMap = new HashMap<>();
+//        // hashMap 增强for循环
+//        hashMap.forEach((k, v) -> {
+//            System.out.println(k + " " + v);
+//        });
+//        Arrays.sort(str, new Comparator<String>() {
+//            @Override
+//            public int compare(String o1, String o2) {
+//                int a = Integer.parseInt(o1 + o2);
+//                int b = Integer.parseInt(o2 + o1);
+//                return a - b;
+//            }
+//        });
+//
+//        System.out.println(Arrays.asList(str));
     }
 }

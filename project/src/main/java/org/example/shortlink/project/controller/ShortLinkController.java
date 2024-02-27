@@ -38,4 +38,11 @@ public class ShortLinkController {
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO shortLinkSaveReqDTO) {
         return Results.success(shortLinkService.pageShortLink(shortLinkSaveReqDTO));
     }
+
+    /**
+     * 只要用户注册成功，就会默认生成一个默认分组
+     * 用户要删除分组前，需要判断当前是不是只剩下一个分组了，
+     * 用户至少要有一个分组
+     */
+
 }
