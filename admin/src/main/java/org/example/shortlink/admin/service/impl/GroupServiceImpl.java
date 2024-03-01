@@ -35,14 +35,14 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
     private final RedissonClient redissonClient;
 
     @Override
-    public void SaveGroup(String groupName) {
+    public void saveGroup(String username, String groupName) {
         String gid;
         do {
             gid = RandomGenerator.generateRandom();
         } while (hasGid(gid));
         GroupDO groupDO = GroupDO.builder()
                 .gid(gid)
-                .username(UserContext.getUsername())
+                .username(username)
                 .name(groupName)
                 .sortOrder(0)
                 .build();
@@ -50,6 +50,11 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         if (insert < 1) {
             throw new ClientException(GroupErrorCodeEnum.Group_SAVE_ERROR);
         }
+    }
+
+    @Override
+    public void saveGroup(String groupName) {
+        saveGroup(UserContext.getUsername(), groupName);
     }
 
     @Override
@@ -75,7 +80,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .collect(Collectors.toList());
         Result<List<ShortLinkGroupCountQueryRespDTO>> listResult = shortLinkRemoteService.listGroupShortLinkCount(gids);
         List<ShortLinkGroupCountQueryRespDTO> data = listResult.getData();
-       // 将list集合转为map集合
+        // 将list集合转为map集合
         Map<String, Integer> collect = data.stream()
                 .collect(Collectors.toMap(ShortLinkGroupCountQueryRespDTO::getGid, ShortLinkGroupCountQueryRespDTO::getShortLinkCount));
         for (ShortLinkGroupRespDTO shortLinkGroupRespDTO : shortLinkGroupRespDTOS) {

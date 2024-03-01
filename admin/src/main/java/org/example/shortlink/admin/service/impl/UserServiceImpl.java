@@ -97,7 +97,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 //     * 用户要删除分组前，需要判断当前是不是只剩下一个分组了，
                 //     * 用户至少要有一个分组
                 //     */
-                groupService.SaveGroup("默认分组");
+                groupService.saveGroup(userRegisterReqDTO.getUsername(), "默认分组");
             } else {
                 throw new ClientException(USER_NAME_EXIST);
 //                throw  new RuntimeException();
