@@ -20,7 +20,8 @@ public enum GroupErrorCodeEnum implements IErrorCode {
 
     Group_NULL("A000206", "短链接分组记录为空"),
 
-    Group_SORT_ERROR("A000207","短链接分组排序失败");
+    Group_SORT_ERROR("A000207", "短链接分组排序失败"),
+    Group_COUNT_ERROR("A000208", "至少应保留一个分组");
 
 
     private final String code;
@@ -41,4 +42,4 @@ public enum GroupErrorCodeEnum implements IErrorCode {
     public String message() {
         return message;
     }
-    }
+}

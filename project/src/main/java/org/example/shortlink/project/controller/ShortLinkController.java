@@ -8,12 +8,12 @@ import org.example.shortlink.common.convention.result.Results;
 import org.example.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.example.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.example.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import org.example.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.example.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import org.example.shortlink.project.service.ShortLinkService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Slf4j
@@ -40,9 +40,21 @@ public class ShortLinkController {
     }
 
     /**
-     * 只要用户注册成功，就会默认生成一个默认分组
-     * 用户要删除分组前，需要判断当前是不是只剩下一个分组了，
-     * 用户至少要有一个分组
+     * 第一种方式：根据每个gid去查询
+     * 根据分组id查询短链接分组内数量
      */
+    @GetMapping("/api/short-link/project/v1/countByGid")
+    public Result<Long> countShortLinkByGid(@RequestParam("gid") String gid) {
+        return Results.success(shortLinkService.countShortLinkByGid(gid));
+    }
+    /**
+     * 第二种方式：根据gid集合去查询
+     * 根据分组id查询短链接分组内数量
+     */
+    @GetMapping("/api/short-link/v1/count")
+    public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("gids")List<String> gids) {
+        return Results.success(shortLinkService.listGroupShortLinkCount(gids));
+    }
+
 
 }

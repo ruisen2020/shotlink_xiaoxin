@@ -17,6 +17,7 @@ import org.example.shortlink.admin.dto.req.UserRegisterReqDTO;
 import org.example.shortlink.admin.dto.req.UserUpdateReqDTO;
 import org.example.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.example.shortlink.admin.dto.resp.UserRespDTO;
+import org.example.shortlink.admin.service.GroupService;
 import org.example.shortlink.admin.service.UserService;
 import org.example.shortlink.common.biz.user.UserContext;
 import org.example.shortlink.common.convention.exception.ClientException;
@@ -50,6 +51,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     private final RedissonClient redissonClient;
 
     private final StringRedisTemplate stringRedisTemplate;
+
+    private final GroupService groupService;
 
     @Override
     public UserRespDTO getUserByUsername(String username) {
@@ -89,6 +92,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 //                    throw  new RuntimeException();
                 }
                 userRegisterCachePenetrationBloomFilter.add(userRegisterReqDTO.getUsername());
+                // TODO  /**
+                //     * 只要用户注册成功，就会默认生成一个默认分组
+                //     * 用户要删除分组前，需要判断当前是不是只剩下一个分组了，
+                //     * 用户至少要有一个分组
+                //     */
+                groupService.SaveGroup("默认分组");
             } else {
                 throw new ClientException(USER_NAME_EXIST);
 //                throw  new RuntimeException();
@@ -127,7 +136,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         String key = LOGIN_USER_KEY + userDO.getUsername();
 
         // 如果之前已经登录过了并且token没有失效，那么在登陆的时候删除原来的token，在创建一个新的token。
-        Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries(LOGIN_USER_KEY);
+        Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries(key);
         String token = null;
         if (CollUtil.isNotEmpty(hasLoginMap)) {
             token = hasLoginMap.keySet().stream()
