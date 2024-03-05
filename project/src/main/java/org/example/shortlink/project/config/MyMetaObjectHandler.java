@@ -23,7 +23,7 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-//        log.info("start update fill ....");
+        log.info("start update fill ....");
         strictInsertFill(metaObject, "updateTime", Date::new, Date.class);
     }
 }

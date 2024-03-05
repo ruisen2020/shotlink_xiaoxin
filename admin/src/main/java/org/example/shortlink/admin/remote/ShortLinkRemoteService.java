@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public interface ShortLinkRemoteService {
     default Result<ShortLinkCreateRespDTO> createShotLink(ShortLinkCreateReqDTO shortLinkSaveReqDTO) {
-        String post = HttpUtil.post("http://localhost:8001/api/short-link/project/v1/create", JSON.toJSONString(shortLinkSaveReqDTO));
+        String post = HttpUtil.post("http://localhost:8001/api/short-link/v1/create", JSON.toJSONString(shortLinkSaveReqDTO));
         return JSON.parseObject(post, new TypeReference<Result<ShortLinkCreateRespDTO>>() {
         });
 
@@ -31,7 +31,7 @@ public interface ShortLinkRemoteService {
         requestMap.put("current", shortLinkSaveReqDTO.getCurrent());
         requestMap.put("size", shortLinkSaveReqDTO.getSize());
         requestMap.put("gid", shortLinkSaveReqDTO.getGid());
-        String result = HttpUtil.get("http://localhost:8001/api/short-link/project/v1/page", requestMap);
+        String result = HttpUtil.get("http://localhost:8001/api/v1/page", requestMap);
         return JSON.parseObject(result, new TypeReference<Result<IPage<ShortLinkPageRespDTO>>>() {
         });
 
@@ -40,7 +40,7 @@ public interface ShortLinkRemoteService {
     default Result<Long> countShortLinkByGid(String gid) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("gid", gid);
-        String result = HttpUtil.get("http://localhost:8001/api/short-link/project/v1/countByGid?gid=" + gid);
+        String result = HttpUtil.get("http://localhost:8001/api/short-link/v1/countByGid?gid=" + gid);
         System.out.println(result);
         return JSON.parseObject(result, new TypeReference<Result<Long>>() {
         });
@@ -53,7 +53,7 @@ public interface ShortLinkRemoteService {
 //        for (String gid : gids) {
 //            url += "gids=" + gid + "&";
 //        }
-        String result = HttpUtil.get("http://localhost:8001/api/short-link/v1/count",requestMap);
+        String result = HttpUtil.get("http://localhost:8001/api/short-link/v1/count", requestMap);
         return JSON.parseObject(result, new TypeReference<Result<List<ShortLinkGroupCountQueryRespDTO>>>() {
         });
     }

@@ -5,30 +5,39 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.text.StrBuilder;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.shortlink.common.convention.exception.ClientException;
 import org.example.shortlink.common.convention.exception.ServiceException;
 import org.example.shortlink.project.dao.entity.ShortLinkDO;
 import org.example.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.example.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.example.shortlink.project.dto.req.ShortLinkPageReqDTO;
+import org.example.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
 import org.example.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.example.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.example.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import org.example.shortlink.project.service.ShortLinkService;
 import org.example.shortlink.project.util.HashUtil;
 import org.redisson.api.RBloomFilter;
+import org.redisson.api.RLock;
+import org.redisson.api.RReadWriteLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.example.shortlink.common.enums.ShortLinkErrorCodeEnum.SHORTLINK_CREATE_ERROR;
-import static org.example.shortlink.common.enums.ShortLinkErrorCodeEnum.SHORTLINK_SAVE_ERROR;
+import static org.example.shortlink.common.constant.RedisCacheConstant.LOCK_GID_UPDATE_KEY;
+import static org.example.shortlink.common.enums.ShortLinkErrorCodeEnum.*;
 
 
 /**
@@ -41,6 +50,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
 
     private final RBloomFilter<String> shortUriCreateCachePenetrationBloomFilter;
+
+    private final RedissonClient redissonClient;
+
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Override
     public ShortLinkCreateRespDTO createShotLink(ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
@@ -116,6 +129,75 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         List<Map<String, Object>> maps = baseMapper.selectMaps(queryWrapper);
         return BeanUtil.copyToList(maps, ShortLinkGroupCountQueryRespDTO.class);
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Void updateShortLink(ShortLinkUpdateReqDTO shortLinkUpdateReqDTO) {
+
+        String originGid = shortLinkUpdateReqDTO.getOriginGid();
+        String gid = shortLinkUpdateReqDTO.getGid();
+
+        // 查询该链接的原数据
+        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid, originGid)
+                .eq(ShortLinkDO::getFullShortUrl, shortLinkUpdateReqDTO.getFullShortUrl())
+                .eq(ShortLinkDO::getDelFlag, 0)
+                .eq(ShortLinkDO::getEnableStatus, 0);
+
+        ShortLinkDO shortLinkDO = baseMapper.selectOne(queryWrapper);
+
+        if (shortLinkDO == null) {
+            log.warn("更新的短链接在表中不存在，gid: {}, shortUrl: {}", originGid, shortLinkUpdateReqDTO.getFullShortUrl());
+            throw new ClientException(SHORTLINK_NULL);
+        }
+
+        // 设置更新时间为null，这样MyBatis-Plus会自动帮我们填充
+        shortLinkDO.setUpdateTime(null);
+        // 设置原始连接
+        shortLinkDO.setOriginUrl(shortLinkUpdateReqDTO.getOriginUrl());
+        // 设置有效时间
+        shortLinkDO.setValidDateType(shortLinkUpdateReqDTO.getValidDateType());
+        shortLinkDO.setValidDate(shortLinkUpdateReqDTO.getValidDate());
+        // 设置描述信息
+        shortLinkDO.setDescribe(shortLinkUpdateReqDTO.getDescribe());
+
+        // 如果修改分组，因为分表的原因，就需要将原数据在原表中删除，添加到新的表中
+        LambdaUpdateWrapper<ShortLinkDO> eq = Wrappers.lambdaUpdate(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid, originGid)
+                .eq(ShortLinkDO::getFullShortUrl, shortLinkUpdateReqDTO.getFullShortUrl())
+                .eq(ShortLinkDO::getDelFlag, 0)
+                .eq(ShortLinkDO::getEnableStatus, 0);
+
+        if (StringUtils.equals(shortLinkDO.getGid(), gid)) {
+            // 如果不修改分组，直接更新数据
+            shortLinkDO.setGid(shortLinkUpdateReqDTO.getOriginGid());
+            baseMapper.update(shortLinkDO, eq);
+        } else {
+            // 使用分布式锁
+            RReadWriteLock readWriteLock = redissonClient.getReadWriteLock(String.format(LOCK_GID_UPDATE_KEY, shortLinkUpdateReqDTO.getFullShortUrl()));
+            RLock rLock = readWriteLock.writeLock();
+            if (!rLock.tryLock()) {
+                throw new ServiceException("短链接正在被访问，请稍后再试...");
+            }
+            try {
+                // 如果修改分组，因为分表的原因，就需要将原数据在原表中删除，添加到新的表中
+                baseMapper.delete(eq);
+                shortLinkDO.setGid(shortLinkUpdateReqDTO.getGid());
+                // 将id设置为null，这样数据库就会自己填充id
+                shortLinkDO.setId(null);
+                baseMapper.insert(shortLinkDO);
+            } catch (Exception e) {
+                log.error("修改分组失败，原分组：{}，新分组：{}", originGid, gid);
+                throw new ServiceException(SHORTLINK_UPDATE_ERROR);
+            }
+        }
+
+
+
+
+        return null;
+    }
+
 
     private String generateSuffix(ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
         String shortUri = "";

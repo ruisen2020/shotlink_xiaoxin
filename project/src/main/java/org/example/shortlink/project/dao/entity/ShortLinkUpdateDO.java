@@ -1,29 +1,13 @@
 package org.example.shortlink.project.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.example.shortlink.common.database.BaseDO;
 
 import java.util.Date;
 
-/**
- * 短链接实体
- */
 @Data
-@Builder
-@TableName("t_link")
-@NoArgsConstructor
-@AllArgsConstructor
-public class ShortLinkDO extends BaseDO {
+public class ShortLinkUpdateDO {
 
-    /**
-     * id
-     */
-    private Long id;
     /**
      * 域名
      */
@@ -76,4 +60,14 @@ public class ShortLinkDO extends BaseDO {
     // describe 是数据库中的保留关键字，应加引号
     @TableField("`describe`")
     private String describe;
+
+    /**
+     * 删除标识 0：未删除 1：已删除
+     */
+    private Integer delFlag;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 }
