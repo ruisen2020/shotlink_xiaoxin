@@ -168,19 +168,21 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .eq(ShortLinkDO::getDelFlag, 0)
                 .eq(ShortLinkDO::getEnableStatus, 0);
 
+        // 判断要传入的分组是否和当前分组相同
         if (StringUtils.equals(shortLinkDO.getGid(), gid)) {
-            // 如果不修改分组，直接更新数据
+            // 如果分组相同，直接更新数据
             shortLinkDO.setGid(shortLinkUpdateReqDTO.getOriginGid());
             baseMapper.update(shortLinkDO, eq);
         } else {
-            // 使用分布式锁
+            // 如果分组不同因为分表的原因，就需要将原数据在原表中删除，添加到新的表中
+            // 使用分布式锁，来保证原子性，因为这里涉及删除和新增两步操作
             RReadWriteLock readWriteLock = redissonClient.getReadWriteLock(String.format(LOCK_GID_UPDATE_KEY, shortLinkUpdateReqDTO.getFullShortUrl()));
             RLock rLock = readWriteLock.writeLock();
             if (!rLock.tryLock()) {
                 throw new ServiceException("短链接正在被访问，请稍后再试...");
             }
             try {
-                // 如果修改分组，因为分表的原因，就需要将原数据在原表中删除，添加到新的表中
+
                 baseMapper.delete(eq);
                 shortLinkDO.setGid(shortLinkUpdateReqDTO.getGid());
                 // 将id设置为null，这样数据库就会自己填充id
@@ -191,8 +193,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 throw new ServiceException(SHORTLINK_UPDATE_ERROR);
             }
         }
-
-
 
 
         return null;
